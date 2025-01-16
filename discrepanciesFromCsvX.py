@@ -22,12 +22,12 @@ def process_csv(input_file, output_file):
 
     discrepancies = []
 
-    def preprocess(value, is_num=False):
+    def preprocess(value, is_oln=False):
         if value is None or str(value).isspace() or str(value).strip() == '':
             return '<NULL>'
         value = str(value).strip().upper().replace('O', '0')
-        if is_num:
-            return int(value)
+        if is_oln:
+            return value.lstrip('0')  # Remove leading zeros
         return value
 
     for nic, group in grouped_rows.items():
@@ -37,9 +37,9 @@ def process_csv(input_file, output_file):
 
             for header in all_headers:
                 if header not in required_headers and header not in ignore_columns:
-                    is_num = True if (header == 'OLN') else False
-                    value1 = preprocess(row1.get(header, '<NULL>'), is_num)
-                    value2 = preprocess(row2.get(header, '<NULL>'), is_num)
+                    is_oln = (header == 'OLN')
+                    value1 = preprocess(row1.get(header, '<NULL>'), is_oln)
+                    value2 = preprocess(row2.get(header, '<NULL>'), is_oln)
                     if value1 != value2:
                         if header not in headers_to_write:
                             headers_to_write.append(header)
